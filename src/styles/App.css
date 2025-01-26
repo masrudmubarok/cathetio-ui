@@ -1,42 +1,36 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+:root {
+	--primaryPurple: #646ff0;
+	--black-1: #646681;
+	--black-2: #585858;
+	--bg-1: #f8f8ff;
+	--bg-2: #ecedf6;
+	--bg-3: #cccdde;
+	--gray-1: #eee;
+	--gray-2: #dedfe1;
+	--black: black;
+	--white: white;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+html {
+	font-size: 10px;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body {
+	font-family: 'Poppins', sans-serif;
+	width: 100%;
+	min-height: 100vh;
+	background-color: var(--bg-1);
 }
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+* {
+	font-family: 'Poppins', sans-serif;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+.container {
+	width: 90%;
+	max-width: 1200px;
+	margin: 0 auto;
 }
