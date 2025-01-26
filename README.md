@@ -16,6 +16,7 @@ cathet.io UI is the frontend for the cathet.io application. This repository cont
 - CSS/SCSS (for styling)
 - Axios (for API requests)
 - React Router (for routing)
+- Vite (a fast build tool and development server for React.js)
 
 ## Installation
 
