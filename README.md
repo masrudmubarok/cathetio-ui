@@ -27,7 +27,7 @@ cathet.io UI is the frontend for the cathet.io application. This repository cont
    ```npm install```
 3. Create a `.env` file based on `.env.example` and configure the API endpoint and other settings.
 4. Run the server:
-   ```npm start```
+   ```npm run dev```
 
 ## Directory
 
