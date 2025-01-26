@@ -1,11 +1,12 @@
 import React from 'react'
 import './styles/App.css'
+import PageTitle from './components/PageTitle.jsx';
 
 function App() {
 
   return (
     <div className="container">
-      <h1>Cathet.io</h1>
+      <PageTitle>Cathet.io</PageTitle>
     </div>
   )
 
