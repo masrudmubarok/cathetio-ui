@@ -1,6 +1,7 @@
 import React from 'react'
 import PageTitle from './components/PageTitle.jsx'
-import Header from './components/AppHeader.jsx'
+import AppHeader from './components/AppHeader.jsx'
+import AppContent from './components/AppContent.jsx'
 import style from './styles/modules/app.module.scss'
 
 function App() {
@@ -9,7 +10,8 @@ function App() {
     <div className="container">
       <PageTitle>Cathet.io</PageTitle>
       <div className={style.app__wrapper}>
-        <Header />
+        <AppHeader />
+        <AppContent />
       </div>
     </div>
   )
