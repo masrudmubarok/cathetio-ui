@@ -1,3 +1,8 @@
+import React, { useState }  from 'react'
+import style from '../styles/modules/modal.module.scss'
+import { MdOutlineClose } from 'react-icons/md'
+import Button from './Button'
+
 function TodoModal({ modalOpen, setModalOpen }) {
     const [title, setTitle] = useState('') // State to store the title of the task
     const [description, setDescription] = useState('') // State to store the description of the task
@@ -90,3 +95,5 @@ function TodoModal({ modalOpen, setModalOpen }) {
         )
     )
 }
+
+export default TodoModal
