@@ -1,17 +1,38 @@
-import React, { useState }  from 'react'
-import style from '../styles/modules/modal.module.scss'
-import { MdOutlineClose } from 'react-icons/md'
-import Button from './Button'
+import React, { useState }  from 'react';
+import style from '../styles/modules/modal.module.scss';
+import { MdOutlineClose } from 'react-icons/md';
+import { useDispatch } from 'react-redux';
+import Button from './Button';
+import { addTodo } from '../slice/todoSlice';
+import { v4 as uuid } from 'uuid';
+import { nextDay } from 'date-fns';
+import toast from 'react-hot-toast';
 
 function TodoModal({ modalOpen, setModalOpen }) {
-    const [title, setTitle] = useState('') // State to store the title of the task
-    const [description, setDescription] = useState('') // State to store the description of the task
-    const [status, setStatus] = useState('incomplete') // State to store the status of the task (default is "incomplete")
+    const [title, setTitle] = useState(''); // State to store the title of the task
+    const [description, setDescription] = useState(''); // State to store the description of the task
+    const [status, setStatus] = useState('incomplete'); // State to store the status of the task (default is "incomplete")
+
+    const dispatch = useDispatch();
 
     // Function to handle form submission
     const handleSubmit = (e) => {
         e.preventDefault() // Prevents the default form submission behavior
-        console.log({ title, description, status }) // Logs the task details to the console
+        if(title && description && status) {
+            dispatch(
+                addTodo({
+                    id: uuid(),
+                    title,
+                    description,
+                    status,
+                    time: new Date().toLocaleString(),
+                })
+            );
+            toast.success('Task added successfully');
+            setModalOpen(false); // Closes the modal after successful task addition
+        } else {
+            toast.error("The title or description shouldn't be empty");
+        }
     }
 
     // Render the modal only if `modalOpen` is true
@@ -96,4 +117,4 @@ function TodoModal({ modalOpen, setModalOpen }) {
     )
 }
 
-export default TodoModal
+export default TodoModal;
