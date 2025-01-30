@@ -29,8 +29,21 @@ export const todoSlice = createSlice({
                 window.localStorage.setItem('todoList', JSON.stringify([{ ...action.payload }]));  // Create new list if none exists
             }
         },
+        deleteTodo: (state, action) => {
+            const todoList = window.localStorage.getItem('todoList');
+            if(todoList) {
+                const todoListArr = JSON.parse(todoList);
+                todoListArr.forEach((todo, index) => {
+                    if(todo.id === action.payload) {
+                        todoListArr.splice(index, 1);
+                    }
+                });
+                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));
+                state.todoList = todoListArr;
+            }
+        },
     },
 });
 
-export const { addTodo } = todoSlice.actions;   // Export action for adding todos
+export const { addTodo, deleteTodo } = todoSlice.actions;   // Export action for adding todos
 export default todoSlice.reducer;              // Export reducer to be used in the store
