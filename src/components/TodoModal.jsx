@@ -1,37 +1,72 @@
-import React, { useState }  from 'react';
+import React, { useState, useEffect }  from 'react';
 import style from '../styles/modules/modal.module.scss';
 import { MdOutlineClose } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import Button from './Button';
-import { addTodo } from '../slice/todoSlice';
+import { addTodo, updateTodo } from '../slice/todoSlice';
 import { v4 as uuid } from 'uuid';
 import { nextDay } from 'date-fns';
 import toast from 'react-hot-toast';
 
-function TodoModal({ modalOpen, setModalOpen }) {
+function TodoModal({ type, modalOpen, setModalOpen, todo }) {
     const [title, setTitle] = useState(''); // State to store the title of the task
     const [description, setDescription] = useState(''); // State to store the description of the task
     const [status, setStatus] = useState('incomplete'); // State to store the status of the task (default is "incomplete")
 
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        if (type === 'update' && todo) {
+            setTitle(todo.title);
+            setDescription(todo.description);
+            setStatus(todo.status);
+        } else {
+            setTitle('');
+            setDescription('');
+            setStatus('incomplete');
+        }
+    }, [type, todo, modalOpen]);
+
     // Function to handle form submission
     const handleSubmit = (e) => {
         e.preventDefault() // Prevents the default form submission behavior
-        if(title && description && status) {
-            dispatch(
-                addTodo({
-                    id: uuid(),
-                    title,
-                    description,
-                    status,
-                    time: new Date().toLocaleString(),
-                })
-            );
-            toast.success('Task added successfully');
+        if (title === '') {
+            toast.error('Please enter a title');
+            return;
+        }
+        if (description === '') {
+            toast.error('Please enter a description');
+            return;
+        }
+        if (title && description && status) {
+            if (type === 'add') {
+                dispatch(
+                    addTodo({
+                        id: uuid(),
+                        title,
+                        description,
+                        status,
+                        time: new Date().toLocaleString(),
+                    })
+                );
+                toast.success('Task added successfully');
+            }
+            if (type === 'update') {
+                if (todo.title !== title || todo.description !== description || todo.status !== status) {
+                    dispatch(
+                        updateTodo({
+                            ...todo,
+                            title,
+                            description,
+                            status,
+                        })
+                    );
+                    toast.success('Task updated successfully');
+                } else {
+                    toast.error('No changes made');
+                }
+            }
             setModalOpen(false); // Closes the modal after successful task addition
-        } else {
-            toast.error("The title or description shouldn't be empty");
         }
     }
 
@@ -54,7 +89,9 @@ function TodoModal({ modalOpen, setModalOpen }) {
                         className={style.form} 
                         onSubmit={(e) => handleSubmit(e)} // Calls `handleSubmit` when the form is submitted
                     >
-                        <h1 className={style.formTitle}>Add Task</h1>
+                        <h1 className={style.formTitle}>
+                            {type === 'update' ? 'Update' : 'Add'} Task
+                        </h1>
                         
                         {/* Label and input field for task title */}
                         <label htmlFor="title">
@@ -98,7 +135,7 @@ function TodoModal({ modalOpen, setModalOpen }) {
                                 type="submit" 
                                 variant="primary"
                             >
-                                Add Task
+                                {type === 'update' ? 'Update' : 'Add'} Task
                             </Button>
                             {/* Cancel button to close the modal */}
                             <Button 
