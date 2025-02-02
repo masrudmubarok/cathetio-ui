@@ -1,78 +1,66 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-// Function to get the initial todo list from localStorage, or initialize it if it doesn't exist
-const getInitialTodo = () => {
-    const localTodoList = window.localStorage.getItem('todoList');  // Attempt to retrieve the 'todoList' from localStorage
-    if(localTodoList){
-        return JSON.parse(localTodoList);   // If a todo list exists in localStorage, parse and return it
-    }
-    window.localStorage.setItem('todoList', JSON.stringify([]));    // If no todo list exists, initialize an empty list in localStorage
-    return [];  // Return an empty list if none is found
-};
+const API_URL = process.env.REACT_APP_API_URL;
 
-// Initial state for the todo slice, which includes a filter status and the todo list fetched from localStorage
-const initialValue = {
-    filterStatus: 'all',  // Default filter status set to 'all'
-    todoList: getInitialTodo()  // Set the initial todo list from localStorage
-};
-
-// Creating the 'todo' slice using Redux Toolkit's createSlice method
-export const todoSlice = createSlice({
-    name: 'todo',  // The name of the slice
-    initialState: initialValue,  // Setting the initial state defined earlier
-    reducers: {
-        // Reducer to add a new todo item to the state and localStorage
-        addTodo: (state, action) => {
-            state.todoList.push(action.payload);    // Add the new todo item to the Redux state
-            
-            const todoList = window.localStorage.getItem('todoList');
-            if(todoList) {
-                const todoListArr = JSON.parse(todoList);  // Parse the existing todo list from localStorage
-                todoListArr.push({ ...action.payload });   // Add the new todo item to the list in localStorage
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));  // Save the updated list back to localStorage
-            } else {
-                window.localStorage.setItem('todoList', JSON.stringify([{ ...action.payload }]));  // If no list exists, create a new list with the new todo item
-            }
-        },
-        // Reducer to delete a todo item from the state and localStorage
-        deleteTodo: (state, action) => {
-            const todoList = window.localStorage.getItem('todoList');
-            if(todoList) {
-                const todoListArr = JSON.parse(todoList);  // Retrieve the existing todo list from localStorage
-                todoListArr.forEach((todo, index) => {
-                    if(todo.id === action.payload) {  // Find the todo item to delete by its ID
-                        todoListArr.splice(index, 1);  // Remove the item from the array
-                    }
-                });
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));  // Save the updated list to localStorage
-                state.todoList = todoListArr;  // Update the Redux state with the new list
-            }
-        },
-        // Reducer to update a todo item in both the state and localStorage
-        updateTodo: (state, action) => {
-            const todoList = window.localStorage.getItem('todoList');
-            if(todoList) {
-                const todoListArr = JSON.parse(todoList);  // Retrieve the existing todo list from localStorage
-                todoListArr.forEach((todo, index) => {
-                    if(todo.id === action.payload.id) {  // Find the todo item to update by its ID
-                        todo.title = action.payload.title;
-                        todo.description = action.payload.description;
-                        todo.status = action.payload.status;  // Update the item's properties
-                    }
-                });
-                window.localStorage.setItem('todoList', JSON.stringify(todoListArr));  // Save the updated list to localStorage
-                state.todoList = todoListArr;  // Update the Redux state with the modified list
-            }
-        },
-        // Reducer to update the filter status in the state
-        updateFilterStatus: (state, action) => {
-            state.filterStatus = action.payload;  // Update the filter status in the Redux state
-        },
-    },
+// Fetch Todo from API
+export const getTodo = createAsyncThunk("todo/getTodo", async () => {
+  const response = await axios.get(API_URL);
+  return response.data.data;
 });
 
-// Export the actions to be used in components
-export const { addTodo, deleteTodo, updateTodo, updateFilterStatus } = todoSlice.actions;   
+// Add a New Todo
+export const addTodo = createAsyncThunk("todo/addTodo", async (newTodo) => {
+  const response = await axios.post(API_URL, newTodo);
+  return response.data;
+});
 
-// Export the reducer to be used in the Redux store
+// Delete a Todo
+export const deleteTodo = createAsyncThunk("todo/deleteTodo", async (id) => {
+  await axios.delete(`${API_URL}/${id}`); // Use template literals (backticks) for string interpolation
+  return id; // Return the id of the deleted todo
+});
+
+// Update a Todo
+export const updateTodo = createAsyncThunk("todo/updateTodo", async (updatedTodo) => {
+  const response = await axios.put(`${API_URL}/${updatedTodo.id}`, updatedTodo); // Use template literals (backticks) for string interpolation
+  return response.data; // Return the updated todo data
+});
+
+// Initial State
+const initialState = {
+  todoList: [],
+  filterStatus: "all",
+};
+
+// Create Todo Slice
+const todoSlice = createSlice({
+  name: "todo",
+  initialState,
+  reducers: {
+    updateFilterStatus: (state, action) => {
+      state.filterStatus = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getTodo.fulfilled, (state, action) => {
+        state.todoList = action.payload;
+      })
+      .addCase(addTodo.fulfilled, (state, action) => {
+        state.todoList.push(action.payload);
+      })
+      .addCase(deleteTodo.fulfilled, (state, action) => {
+        state.todoList = state.todoList.filter((todo) => todo.id !== action.payload);
+      })
+      .addCase(updateTodo.fulfilled, (state, action) => {
+        state.todoList = state.todoList.map((todo) =>
+          todo.id === action.payload.id ? action.payload : todo
+        );
+      });
+  },
+});
+
+// Export Actions and Reducer
+export const { updateFilterStatus } = todoSlice.actions;
 export default todoSlice.reducer;
