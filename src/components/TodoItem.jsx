@@ -7,6 +7,15 @@ import { useDispatch } from 'react-redux';
 import { deleteTodo, updateTodo } from '../slice/todoSlice';
 import TodoModal from './TodoModal';
 import CheckButton from './CheckButton';
+import { motion } from 'framer-motion';
+
+const child = {
+    hidden: { y: 20, opacity: 0},
+    visible: {
+      y: 0,
+      opacity: 1,
+    }
+};
 
 function TodoItem({ todo }) {
     const dispatch = useDispatch();
@@ -38,7 +47,7 @@ function TodoItem({ todo }) {
 
     return (
         <>
-            <div className={style.item}>
+            <motion.div className={style.item} variants={child}>
                 <div className={style.todoDetails}>
                     <CheckButton checked={checked} handleCheck={handleCheck} />
                     <div className={style.texts}>
@@ -74,7 +83,7 @@ function TodoItem({ todo }) {
                         <MdEdit />
                     </div>
                 </div>
-            </div>
+            </motion.div>
             <TodoModal 
                 type='update'
                 todo={todo}

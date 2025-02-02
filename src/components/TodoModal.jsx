@@ -7,6 +7,28 @@ import { addTodo, updateTodo } from '../slice/todoSlice';
 import { v4 as uuid } from 'uuid';
 import { nextDay } from 'date-fns';
 import toast from 'react-hot-toast';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const dropIn = {
+    hidden: {
+        opacity: 0,
+        transform: 'scale(0.9)',
+    },
+    visible: {
+        transform: 'scale(1)',
+        opacity: 1,
+        transition: {
+            duration: 0.1,
+            type: 'spring',
+            damping: 25,
+            stiffness: 500, 
+        },
+    },
+    exit: {
+        transform: 'scale(0.9',
+        opacity: 0,
+    },
+};
 
 function TodoModal({ type, modalOpen, setModalOpen, todo }) {
     const [title, setTitle] = useState(''); // State to store the title of the task
@@ -64,6 +86,7 @@ function TodoModal({ type, modalOpen, setModalOpen, todo }) {
                     toast.success('Task updated successfully');
                 } else {
                     toast.error('No changes made');
+                    return;
                 }
             }
             setModalOpen(false); // Closes the modal after successful task addition
@@ -72,19 +95,34 @@ function TodoModal({ type, modalOpen, setModalOpen, todo }) {
 
     // Render the modal only if `modalOpen` is true
     return (
-        modalOpen && (
-            <div className={style.wrapper}>
-                <div className={style.container}>
+        <AnimatePresence>
+        {modalOpen && (
+            <motion.div 
+                className={style.wrapper}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+            >
+                <motion.div 
+                    className={style.container} 
+                    variants={dropIn}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                >
                     {/* Close button to close the modal */}
-                    <div 
+                    <motion.div 
                         className={style.closeButton} 
                         onClick={() => setModalOpen(false)} // Closes the modal when clicked
                         onKeyDown={() => setModalOpen(false)} // Allows closing via keyboard navigation
                         tabIndex={0} // Makes the button focusable
                         role="button" // Assigns button semantics
+                        initial={{ top: 40, opacity: 0 }}
+                        animate={{ top: -10, opacity: 1 }}
+                        exit={{ top: 40, opacity: 0 }}
                     >
                         <MdOutlineClose /> {/* Close icon */}
-                    </div>
+                    </motion.div>
                     <form 
                         className={style.form} 
                         onSubmit={(e) => handleSubmit(e)} // Calls `handleSubmit` when the form is submitted
@@ -148,10 +186,11 @@ function TodoModal({ type, modalOpen, setModalOpen, todo }) {
                             </Button>
                         </div>
                     </form>
-                </div>
-            </div>
-        )
-    )
+                </motion.div>
+            </motion.div>
+        )}
+        </AnimatePresence>
+    );
 }
 
 export default TodoModal;
